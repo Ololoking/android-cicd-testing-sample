@@ -9,10 +9,15 @@ import javax.inject.Inject
 class VeryImportantLocalDataSourceImpl @Inject constructor(
 ) : VeryImportantLocalDataSource {
 
-    private var counter = 1
+    private var retrieveCounter = 1
+    private var screenLoadAtTime = 0L
 
     override suspend fun retrieveData(): Int {
-        return counter++ * MULTIPLIER
+        return retrieveCounter++ * MULTIPLIER
+    }
+
+    override suspend fun storeData(data: Long) {
+        screenLoadAtTime = data
     }
 
     companion object {

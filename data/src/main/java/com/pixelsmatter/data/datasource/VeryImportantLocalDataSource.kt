@@ -1,6 +1,8 @@
 package com.pixelsmatter.data.datasource
 
-fun interface VeryImportantLocalDataSource {
+interface VeryImportantLocalDataSource {
     suspend fun retrieveData(): Int
+    suspend fun storeData(data: Long)
+
 }
 

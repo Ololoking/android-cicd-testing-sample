@@ -24,6 +24,11 @@ class GreetingProcessor @Inject constructor(
                     emit(currentState.copy(isLoading = false, error = e.message ?: "Unknown error"))
                 }
             }
+
+            is GreetingScreenAction.ScreenLoad -> {
+                importantRepository.storeData(action.time)
+                emit(currentState.copy())
+            }
         }
     }
 }
