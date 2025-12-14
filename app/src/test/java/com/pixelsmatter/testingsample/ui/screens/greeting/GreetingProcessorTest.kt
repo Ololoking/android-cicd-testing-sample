@@ -71,6 +71,7 @@ class GreetingProcessorTest {
         assertNull(states[0].error)
 
         // Second state: Error
+        assertEquals("Hello", states[1].displayValue) // displayValue retains value from initial currentState
         assertFalse(states[1].isLoading)
         assertEquals(errorMessage, states[1].error)
 
@@ -91,6 +92,7 @@ class GreetingProcessorTest {
         assertEquals(2, states.size)
 
         // Second state should have unknown error
+        assertEquals("Hello", states[1].displayValue) // displayValue retains value from initial currentState
         assertFalse(states[1].isLoading)
         assertEquals("Unknown error", states[1].error)
 
