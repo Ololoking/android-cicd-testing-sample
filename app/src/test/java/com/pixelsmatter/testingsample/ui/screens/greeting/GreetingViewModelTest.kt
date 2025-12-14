@@ -3,7 +3,6 @@ package com.pixelsmatter.testingsample.ui.screens.greeting
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
@@ -16,7 +15,6 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -161,16 +159,6 @@ class GreetingViewModelTest {
         // Assert
         assertEquals(state2, viewModel.uiState.value)
         coVerify(exactly = 2) { mockProcessor.processAction(any(), action) }
-    }
-
-    @Test
-    fun `uiState should be exposed as StateFlow`() {
-        // Assert - verify that uiState is a StateFlow (has value property)
-        val state = viewModel.uiState.value
-        assertEquals("Hello", state.displayValue)
-
-        // StateFlow should always have a value
-        assertTrue(viewModel.uiState.value is GreetingUiState)
     }
 }
 

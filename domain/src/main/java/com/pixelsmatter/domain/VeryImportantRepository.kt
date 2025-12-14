@@ -1,5 +1,6 @@
 package com.pixelsmatter.domain
 
-fun interface VeryImportantRepository {
+interface VeryImportantRepository {
     suspend fun retrieveData(): Int
+    suspend fun clearData() : Int
 }

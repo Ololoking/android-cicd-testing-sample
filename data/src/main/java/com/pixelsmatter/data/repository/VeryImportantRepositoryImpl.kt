@@ -11,4 +11,8 @@ class VeryImportantRepositoryImpl @Inject constructor(
     override suspend fun retrieveData(): Int {
         return localDataSource.retrieveData()
     }
+
+    override suspend fun clearData(): Int {
+        return localDataSource.clearData()
+    }
 }
