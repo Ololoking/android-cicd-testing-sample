@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">android-cicd-testing-sample</string>
+    <string name="greetings_screen_title">Hello</string>
+    <string name="greetings_screen_button_title">Retrieve Data</string>
 </resources>
