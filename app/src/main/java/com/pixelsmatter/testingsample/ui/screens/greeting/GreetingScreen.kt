@@ -68,7 +68,7 @@ fun GreetingScreenPreview() {
     AppTheme {
         GreetingContent(
             uiState = GreetingUiState(
-                displayValue = stringResource(R.string.greetings_screen_title)
+                displayValue = "Hello"
             ),
             onAction = {}
         )
