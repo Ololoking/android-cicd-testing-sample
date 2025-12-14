@@ -12,11 +12,12 @@ class VeryImportantLocalDataSourceImpl @Inject constructor(
     private var counter = 1
 
     override suspend fun retrieveData(): Int {
-        return counter++ * MULTIPLIER
+        return counter++ * (MULTIPLIER * ADDITIONAL_MULTIPLIER)
     }
 
     companion object {
         private const val MULTIPLIER = 10 * 4 * 2
+        private const val ADDITIONAL_MULTIPLIER = 3
     }
 
 }
