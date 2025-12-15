@@ -302,5 +302,50 @@ class GreetingProcessorTest {
         // Assert - flow completes after emitting both states
         assertEquals(2, emissionCount)
     }
+
+    @Test
+    fun `importantRepository clearData returns 1 always`() = runTest {
+        // Arrange
+        val initialState = GreetingUiState()
+        val action = GreetingScreenAction.ClearData
+        coEvery { mockRepository.clearData() } returns 1
+
+        // Act
+        processor.processAction(initialState, action).toList()
+
+        // Assert - verify clearData was called and returns 1
+        coVerify(exactly = 1) { mockRepository.clearData() }
+    }
+
+    @Test
+    fun `processAction ClearData with clearData returning 1`() = runTest {
+        // Arrange
+        val initialState = GreetingUiState()
+        val action = GreetingScreenAction.ClearData
+        coEvery { mockRepository.clearData() } returns 1
+
+        // Act - Execute the action
+        val states = processor.processAction(initialState, action).toList()
+
+        // Assert - ClearData doesn't emit states but calls repository with return value 1
+        assertEquals(0, states.size)
+        coVerify(exactly = 1) { mockRepository.clearData() }
+    }
+
+    @Test
+    fun `processAction multiple ClearData calls each return 1`() = runTest {
+        // Arrange
+        val initialState = GreetingUiState()
+        val action = GreetingScreenAction.ClearData
+        coEvery { mockRepository.clearData() } returns 1
+
+        // Act - Call clearData multiple times
+        processor.processAction(initialState, action).toList()
+        processor.processAction(initialState, action).toList()
+        processor.processAction(initialState, action).toList()
+
+        // Assert - clearData called 3 times and always returns 1
+        coVerify(exactly = 3) { mockRepository.clearData() }
+    }
 }
 
