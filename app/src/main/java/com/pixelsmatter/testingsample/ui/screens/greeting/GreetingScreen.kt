@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +29,14 @@ fun GreetingScreen(
         modifier = modifier,
         onAction = viewModel::onAction
     )
+
+    LaunchedEffect(Unit) {
+        viewModel.onAction(
+            action = GreetingScreenAction.ScreenLoad(
+                time = System.currentTimeMillis()
+            )
+        )
+    }
 }
 
 @Composable
@@ -42,7 +51,7 @@ private fun GreetingContent(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
 
-    ) {
+        ) {
         Box(
             modifier = Modifier
                 .weight(1f)

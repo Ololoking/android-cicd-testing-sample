@@ -11,4 +11,9 @@ class VeryImportantRepositoryImpl @Inject constructor(
     override suspend fun retrieveData(): Int {
         return localDataSource.retrieveData()
     }
+
+    override suspend fun storeData(data: Long) {
+        localDataSource.storeData(data)
+    }
+
 }
