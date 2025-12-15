@@ -19,11 +19,20 @@ class GreetingProcessor @Inject constructor(
                 try {
                     delay(500) // Simulate network delay
                     val data = importantRepository.retrieveData()
-                    emit(currentState.copy(displayValue = data.toString(), isLoading = false, error = null))
+                    emit(
+                        currentState.copy(
+                            displayValue = data.toString(),
+                            isLoading = false,
+                            error = null
+                        )
+                    )
                 } catch (e: Exception) {
                     emit(currentState.copy(isLoading = false, error = e.message ?: "Unknown error"))
                 }
             }
+
+            GreetingScreenAction.ClearData ->
+                importantRepository.clearData()
         }
     }
 }

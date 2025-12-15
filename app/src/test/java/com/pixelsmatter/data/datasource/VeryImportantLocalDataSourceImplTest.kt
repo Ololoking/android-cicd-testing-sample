@@ -32,5 +32,38 @@ class VeryImportantLocalDataSourceImplTest {
         assertEquals(160, a.retrieveData())
         assertEquals(160, b.retrieveData())
     }
+
+    @Test
+    fun `clearData resets counter to 1`() = runBlocking {
+        val ds = VeryImportantLocalDataSourceImpl()
+
+        // Increment counter multiple times
+        ds.retrieveData() // counter becomes 2
+        ds.retrieveData() // counter becomes 3
+        ds.retrieveData() // counter becomes 4
+
+        // Clear and verify
+        val cleared = ds.clearData()
+        assertEquals(1, cleared)
+    }
+
+    @Test
+    fun `clearData allows retrieval to start over`() = runBlocking {
+        val ds = VeryImportantLocalDataSourceImpl()
+
+        // Use data source
+        ds.retrieveData() // counter becomes 2
+        ds.retrieveData() // counter becomes 3
+
+        // Clear
+        ds.clearData()
+
+        // Should start from 1 again
+        val first = ds.retrieveData()
+        assertEquals(80, first)
+
+        val second = ds.retrieveData()
+        assertEquals(160, second)
+    }
 }
 

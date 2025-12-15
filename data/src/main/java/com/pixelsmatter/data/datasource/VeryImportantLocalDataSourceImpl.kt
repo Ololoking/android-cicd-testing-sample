@@ -15,6 +15,11 @@ class VeryImportantLocalDataSourceImpl @Inject constructor(
         return counter++ * MULTIPLIER
     }
 
+    override suspend fun clearData(): Int {
+        counter = 1
+        return counter
+    }
+
     companion object {
         private const val MULTIPLIER = 10 * 4 * 2
     }
