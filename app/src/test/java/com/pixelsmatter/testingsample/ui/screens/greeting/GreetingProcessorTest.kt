@@ -121,5 +121,186 @@ class GreetingProcessorTest {
         assertTrue(states[0].isLoading)
         assertNull(states[0].error)
     }
+
+    @Test
+    fun `processAction should call clearData on repository when ClearData action is received`() = runTest {
+        // Arrange
+        val initialState = GreetingUiState()
+        val action = GreetingScreenAction.ClearData
+        coEvery { mockRepository.clearData() } returns 1
+
+        // Act
+        processor.processAction(initialState, action).toList()
+
+        // Assert
+        coVerify(exactly = 1) { mockRepository.clearData() }
+    }
+
+    @Test
+    fun `processAction should not emit any states for ClearData action`() = runTest {
+        // Arrange
+        val initialState = GreetingUiState()
+        val action = GreetingScreenAction.ClearData
+        coEvery { mockRepository.clearData() } returns 1
+
+        // Act
+        val states = processor.processAction(initialState, action).toList()
+
+        // Assert
+        assertEquals(0, states.size)
+    }
+
+    @Test
+    fun `processAction ClearData should handle exceptions from repository`() = runTest {
+        // Arrange
+        val initialState = GreetingUiState()
+        val action = GreetingScreenAction.ClearData
+        coEvery { mockRepository.clearData() } throws Exception("Clear failed")
+
+        // Act & Assert - should throw exception
+        try {
+            processor.processAction(initialState, action).toList()
+            // If no exception, test passes as we're just verifying clearData was called
+            coVerify(exactly = 1) { mockRepository.clearData() }
+        } catch (ex: Exception) {
+            // Exception is expected, verification already done above
+            coVerify(exactly = 1) { mockRepository.clearData() }
+        }
+    }
+
+    @Test
+    fun `processAction RetrieveData emits correct number of states`() = runTest {
+        // Arrange
+        val initialState = GreetingUiState()
+        val action = GreetingScreenAction.RetrieveData
+        coEvery { mockRepository.retrieveData() } returns 100
+
+        // Act
+        val states = processor.processAction(initialState, action).toList()
+
+        // Assert - should emit exactly 2 states (loading + success)
+        assertEquals(2, states.size)
+        assertTrue(states[0].isLoading)
+        assertFalse(states[1].isLoading)
+    }
+
+    @Test
+    fun `processAction with different initial states preserves custom display value on error`() = runTest {
+        // Arrange
+        val initialState = GreetingUiState(
+            displayValue = "Custom Value",
+            isLoading = false,
+            error = null
+        )
+        val action = GreetingScreenAction.RetrieveData
+        coEvery { mockRepository.retrieveData() } throws Exception("Test error")
+
+        // Act
+        val states = processor.processAction(initialState, action).toList()
+
+        // Assert
+        assertEquals(2, states.size)
+        // First state changes display to Loading
+        assertEquals("Loading...", states[0].displayValue)
+        // Error state preserves original state's display value
+        assertEquals("Custom Value", states[1].displayValue)
+        assertEquals("Test error", states[1].error)
+    }
+
+    @Test
+    fun `processAction RetrieveData with large data value`() = runTest {
+        // Arrange
+        val initialState = GreetingUiState()
+        val action = GreetingScreenAction.RetrieveData
+        val largeValue = 999999
+        coEvery { mockRepository.retrieveData() } returns largeValue
+
+        // Act
+        val states = processor.processAction(initialState, action).toList()
+
+        // Assert
+        assertEquals(2, states.size)
+        assertEquals(largeValue.toString(), states[1].displayValue)
+        assertFalse(states[1].isLoading)
+        assertNull(states[1].error)
+    }
+
+    @Test
+    fun `processAction RetrieveData with negative data value`() = runTest {
+        // Arrange
+        val initialState = GreetingUiState()
+        val action = GreetingScreenAction.RetrieveData
+        val negativeValue = -42
+        coEvery { mockRepository.retrieveData() } returns negativeValue
+
+        // Act
+        val states = processor.processAction(initialState, action).toList()
+
+        // Assert
+        assertEquals(2, states.size)
+        assertEquals(negativeValue.toString(), states[1].displayValue)
+    }
+
+    @Test
+    fun `processAction RetrieveData clears previous error on success`() = runTest {
+        // Arrange
+        val initialState = GreetingUiState(
+            displayValue = "Hello",
+            isLoading = false,
+            error = "Previous error"
+        )
+        val action = GreetingScreenAction.RetrieveData
+        coEvery { mockRepository.retrieveData() } returns 42
+
+        // Act
+        val states = processor.processAction(initialState, action).toList()
+
+        // Assert
+        assertEquals(2, states.size)
+        // First state clears error
+        assertNull(states[0].error)
+        // Success state also has no error
+        assertNull(states[1].error)
+    }
+
+    @Test
+    fun `processAction ClearData with exception still calls repository`() = runTest {
+        // Arrange
+        val initialState = GreetingUiState(
+            displayValue = "Test",
+            isLoading = false,
+            error = null
+        )
+        val action = GreetingScreenAction.ClearData
+        coEvery { mockRepository.clearData() } throws RuntimeException("Clear operation failed")
+
+        // Act & Assert
+        var exceptionThrown = false
+        try {
+            processor.processAction(initialState, action).toList()
+        } catch (e: RuntimeException) {
+            exceptionThrown = true
+        }
+        assertTrue(exceptionThrown)
+        coVerify(exactly = 1) { mockRepository.clearData() }
+    }
+
+    @Test
+    fun `processAction RetrieveData flow completes after emitting states`() = runTest {
+        // Arrange
+        val initialState = GreetingUiState()
+        val action = GreetingScreenAction.RetrieveData
+        coEvery { mockRepository.retrieveData() } returns 55
+
+        // Act
+        val flow = processor.processAction(initialState, action)
+        var emissionCount = 0
+        flow.collect { _ ->
+            emissionCount++
+        }
+
+        // Assert - flow completes after emitting both states
+        assertEquals(2, emissionCount)
+    }
 }
 

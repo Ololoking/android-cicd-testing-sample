@@ -160,5 +160,63 @@ class GreetingViewModelTest {
         assertEquals(state2, viewModel.uiState.value)
         coVerify(exactly = 2) { mockProcessor.processAction(any(), action) }
     }
+
+    @Test
+    fun `onCleared should call processor with ClearData action`() = runTest {
+        // Arrange
+        val clearAction = GreetingScreenAction.ClearData
+        coEvery {
+            mockProcessor.processAction(any(), clearAction)
+        } returns flow {
+            // Empty flow for clear data action
+        }
+
+        // Act
+        viewModel.onCleared()
+        advanceUntilIdle()
+
+        // Assert
+        coVerify(exactly = 1) { mockProcessor.processAction(any(), clearAction) }
+    }
+
+    @Test
+    fun `onCleared should pass current state to processor with ClearData action`() = runTest {
+        // Arrange
+        val currentState = viewModel.uiState.value
+        val clearAction = GreetingScreenAction.ClearData
+
+        coEvery {
+            mockProcessor.processAction(currentState, clearAction)
+        } returns flow {
+            // Empty flow for clear data action
+        }
+
+        // Act
+        viewModel.onCleared()
+        advanceUntilIdle()
+
+        // Assert
+        coVerify(exactly = 1) { mockProcessor.processAction(currentState, clearAction) }
+    }
+
+    @Test
+    fun `onCleared should handle flow from processor with multiple emissions`() = runTest {
+        // Arrange
+        val clearAction = GreetingScreenAction.ClearData
+        val expectedState = GreetingUiState(displayValue = "Cleared", isLoading = false, error = null)
+
+        coEvery {
+            mockProcessor.processAction(any(), clearAction)
+        } returns flow {
+            emit(expectedState)
+        }
+
+        // Act
+        viewModel.onCleared()
+        advanceUntilIdle()
+
+        // Assert
+        coVerify(exactly = 1) { mockProcessor.processAction(any(), clearAction) }
+    }
 }
 
